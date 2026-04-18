@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>AI RPG</title>
+
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState } = React;
+
+function App() {
+  const [story, setStory] = useState("모험을 시작하세요");
+
+  async function action(text) {
+    const res = await fetch("/api/story", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        messages: [{ role: "user", content: text }]
+      })
+    });
+
+    const data = await res.json();
+    setStory(data?.content?.[0]?.text || "응답 없음");
+  }
+
+  return (
+    <div>
+      <h2>AI RPG</h2>
+      <p>{story}</p>
+
+      <button onClick={()=>action("탐험한다")}>탐험</button>
+      <button onClick={()=>action("전투한다")}>전투</button>
+      <button onClick={()=>action("대화한다")}>대화</button>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+
+</body>
+</html>
